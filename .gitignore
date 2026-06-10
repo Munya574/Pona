@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+*.egg-info/
+
+# Large data & model files
+data/raw/
+data/processed/
+*.pt
+*.pth
+*.bin
+*.onnx
+*.h5
+*.pkl
+faiss_index/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+
+# Jupyter
+.ipynb_checkpoints/

@@ -1,0 +1,18 @@
+import { Routes, Route } from 'react-router-dom'
+import Onboarding from './pages/Onboarding'
+import Scan from './pages/Scan'
+import Result from './pages/Result'
+import Profile from './pages/Profile'
+
+export default function App() {
+  return (
+    <div className="min-h-screen bg-white max-w-md mx-auto">
+      <Routes>
+        <Route path="/" element={<Onboarding />} />
+        <Route path="/scan" element={<Scan />} />
+        <Route path="/result" element={<Result />} />
+        <Route path="/profile" element={<Profile />} />
+      </Routes>
+    </div>
+  )
+}
