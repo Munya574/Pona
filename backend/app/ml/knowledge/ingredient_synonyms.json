@@ -1,0 +1,38 @@
+{
+  "_README": {
+    "purpose": "Canonical ingredient name -> label variants that mean the same thing.",
+    "SOURCE_OF_TRUTH": "Hand-curated source, not a generated artifact. notebooks/run_analysis.py reads it; nothing regenerates it.",
+    "scope": "Only ingredient identity belongs here. No nutrition claims, no judgements about whether a food is good or bad.",
+    "see_also": "ingredient_rules.json holds hidden forms, false-friend guards and ambiguous label terms."
+  },
+
+  "milk": ["whole milk", "skim milk", "low-fat milk", "milk solids", "milk-powder", "powdered milk"],
+  "cheese": ["cheddar", "mozzarella", "parmesan", "gouda", "cream cheese"],
+  "butter": ["butterfat", "milk fat", "ghee"],
+  "cream": ["heavy cream", "sour cream", "whipped cream", "creme", "crème"],
+  "casein": ["sodium caseinate", "calcium caseinate", "milk casein", "casein hydrolysate"],
+  "whey": ["whey powder", "sweet whey"],
+  "lactose": ["milk sugar"],
+
+  "egg": ["eggs", "egg white", "egg yolk", "albumen", "albumin", "ovalbumin", "egg powder", "dried egg", "meringue", "mayonnaise"],
+
+  "peanuts": ["groundnuts", "arachis oil", "peanut-flour", "groundnut"],
+  "tree nuts": ["almonds", "walnuts", "cashews", "pistachios", "pecans", "hazelnuts", "macadamia"],
+  "sesame": ["tahini", "sesame oil", "sesame-seeds", "sesame seed", "benne", "gingelly", "til"],
+
+  "gluten": ["wheat gluten", "hydrolyzed wheat protein", "wheat-gluten", "gluten-powder"],
+  "wheat": ["wheat starch", "wheat germ", "wheat-flour", "durum wheat"],
+  "barley": ["pearl barley", "barley flour"],
+  "rye": ["rye flour", "rye bread"],
+
+  "soy": ["soya", "soybean", "soybeans", "soy sauce", "soy lecithin", "soy-oil", "soy-flour", "soy protein", "edamame", "tofu", "tempeh", "miso", "tamari"],
+
+  "fish": ["salmon", "tuna", "cod", "anchovy", "anchovies", "sardine", "sardines", "haddock", "tilapia", "pollock", "fish sauce", "fish oil", "worcestershire sauce"],
+  "shellfish": ["shrimp", "crab", "lobster", "oyster", "clam", "mussel", "scallop"],
+
+  "sulfites": ["sodium sulfite", "potassium sulfite", "sodium bisulfite", "sulfur dioxide"],
+  "citric acid": ["citrate", "citrus acid"],
+  "caffeine": ["coffee extract", "caffeine anhydrous"],
+  "salt": ["sodium chloride", "sea salt", "table salt"],
+  "sugar": ["glucose", "fructose", "sucrose", "dextrose", "cane sugar"]
+}

@@ -1,0 +1,189 @@
+{
+  "_README": {
+    "purpose": "Hand-curated rules that make matching work on REAL label text.",
+    "why_not_in_data_processed": "notebooks/run_analysis.py regenerates sensitivity_kb.json and ingredient_synonyms.json from its own hardcoded dicts. Anything hand-edited there is destroyed on the next run. This file is app-owned source and is never regenerated.",
+    "STATUS": "SEED DATA - NOT CLINICALLY REVIEWED. Entries below reflect well-established food-labelling facts, but this file governs allergen safety decisions and must be reviewed by a qualified dietitian or allergist before any real user relies on it.",
+    "how_to_extend": "hidden_forms: label terms that ARE a canonical allergen but share no obvious word with it. false_friends: phrases that LOOK like an allergen by word-match but are not. ambiguous: phrases that may or may not hide an allergen - always surfaced as CAUTION, never SAFE, never UNSAFE."
+  },
+
+  "hidden_forms": {
+    "wheat": [
+      "semolina", "durum", "durum wheat", "farina", "spelt", "kamut", "einkorn",
+      "emmer", "triticale", "freekeh", "bulgur", "couscous", "orzo", "matzo",
+      "matzah", "panko", "rusk", "graham flour", "enriched flour",
+      "bleached flour", "unbleached flour", "all-purpose flour", "bread flour",
+      "cake flour", "pastry flour", "self-rising flour", "wheat starch",
+      "wheat bran", "wheat germ", "hydrolyzed wheat protein", "farro"
+    ],
+    "gluten": [
+      "seitan", "vital wheat gluten", "malt", "malt extract", "malt syrup",
+      "malted barley", "barley malt", "barley", "rye", "brewer's yeast"
+    ],
+    "casein": [
+      "caseinate", "sodium caseinate", "calcium caseinate", "potassium caseinate",
+      "milk protein", "milk protein concentrate", "recaldent"
+    ],
+    "whey": [
+      "whey protein", "whey protein concentrate", "whey protein isolate",
+      "whey powder", "lactalbumin", "lactoglobulin"
+    ],
+    "milk": [
+      "nonfat dry milk", "non-fat dry milk", "dry milk", "milk powder",
+      "powdered milk", "milk solids", "condensed milk", "evaporated milk",
+      "buttermilk", "malted milk", "half and half", "kefir", "quark",
+      "paneer", "curds"
+    ],
+    "cheese": ["ricotta", "mascarpone", "halloumi", "queso", "romano", "asiago"],
+    "butter": ["butterfat", "milkfat", "milk fat", "anhydrous milkfat", "ghee"],
+    "peanuts": [
+      "groundnut", "groundnuts", "arachis", "arachis oil", "arachis hypogaea",
+      "peanut flour", "peanut butter", "peanut oil", "monkey nuts", "beer nuts",
+      "mandelonas", "goober peas"
+    ],
+    "tree nuts": [
+      "marzipan", "praline", "nougat", "gianduja", "frangipane", "nut butter",
+      "nut paste", "filbert", "hazelnut", "macadamia", "brazil nut", "pine nut",
+      "pignoli", "pili nut", "beechnut"
+    ],
+    "shellfish": [
+      "prawn", "prawns", "crayfish", "crawfish", "langoustine", "scampi",
+      "krill", "scampi", "shrimp paste", "crab extract", "lobster extract"
+    ],
+    "sulfites": [
+      "sulphite", "sulphites", "sodium metabisulfite", "potassium metabisulfite",
+      "sodium bisulfite", "sulfur dioxide", "sulphur dioxide", "e220", "e221",
+      "e222", "e223", "e224", "e226", "e227", "e228"
+    ],
+    "msg": [
+      "monosodium glutamate", "glutamic acid", "e621", "sodium glutamate"
+    ]
+  },
+
+  "false_friends": {
+    "_comment": "phrase -> canonical terms it must NOT be allowed to match. Prevents word-containment false positives that would erode trust.",
+    "cocoa butter": ["butter", "milk"],
+    "shea butter": ["butter", "milk"],
+    "peanut butter": ["butter", "milk"],
+    "almond butter": ["butter", "milk"],
+    "cashew butter": ["butter", "milk"],
+    "sunflower butter": ["butter", "milk"],
+    "apple butter": ["butter", "milk"],
+    "body butter": ["butter", "milk"],
+    "coconut milk": ["milk", "lactose"],
+    "coconut cream": ["cream", "milk", "lactose"],
+    "coconut water": ["milk", "lactose"],
+    "almond milk": ["milk", "lactose"],
+    "soy milk": ["milk", "lactose"],
+    "soya milk": ["milk", "lactose"],
+    "oat milk": ["milk", "lactose"],
+    "rice milk": ["milk", "lactose"],
+    "cashew milk": ["milk", "lactose"],
+    "hemp milk": ["milk", "lactose"],
+    "pea milk": ["milk", "lactose"],
+    "milk thistle": ["milk", "lactose"],
+    "cream of tartar": ["cream", "milk", "lactose"],
+    "creamed corn": ["cream", "milk", "lactose"],
+    "nutmeg": ["tree nuts", "almonds", "walnuts", "cashews", "peanuts"],
+    "butternut squash": ["butter", "tree nuts", "milk"],
+    "water chestnut": ["tree nuts"],
+    "nutritional yeast": ["tree nuts", "peanuts"],
+    "coconut oil": ["milk", "lactose"],
+    "coconut flour": ["tree nuts"],
+    "buckwheat": ["wheat", "gluten"],
+    "buckwheat flour": ["wheat", "gluten"],
+    "rice flour": ["wheat", "gluten"],
+    "almond flour": ["wheat", "gluten"],
+    "corn flour": ["wheat", "gluten"],
+    "chickpea flour": ["wheat", "gluten"],
+    "lactic acid": ["lactose", "milk"],
+    "cream soda": ["cream", "milk", "lactose"],
+    "peanut-free": ["peanuts"],
+    "dairy-free": ["milk", "lactose", "casein", "whey", "butter", "cream", "cheese"],
+    "gluten-free": ["gluten", "wheat"]
+  },
+
+  "ambiguous": {
+    "_comment": "May or may not hide an allergen. Per product decision these are always surfaced as CAUTION with a reason - never silently cleared, never escalated to UNSAFE.",
+    "natural flavors": {
+      "may_contain": ["milk", "casein", "gluten", "wheat"],
+      "note": "Manufacturers are not required to disclose the source of natural flavors; they can be dairy- or wheat-derived."
+    },
+    "natural flavoring": {
+      "may_contain": ["milk", "casein", "gluten", "wheat"],
+      "note": "Manufacturers are not required to disclose the source of natural flavoring."
+    },
+    "artificial flavors": {
+      "may_contain": ["milk", "gluten"],
+      "note": "Carrier ingredients in flavor blends are not always disclosed."
+    },
+    "flavoring": {
+      "may_contain": ["milk", "gluten"],
+      "note": "Unspecified flavoring may use a dairy or wheat carrier."
+    },
+    "modified food starch": {
+      "may_contain": ["wheat", "gluten"],
+      "note": "Usually corn in the US, but can be wheat-derived - especially on imported products."
+    },
+    "food starch": {
+      "may_contain": ["wheat", "gluten"],
+      "note": "Unqualified 'food starch' may be wheat-derived."
+    },
+    "dextrin": {
+      "may_contain": ["wheat", "gluten"],
+      "note": "Dextrin can be produced from wheat starch."
+    },
+    "caramel color": {
+      "may_contain": ["gluten", "barley"],
+      "note": "Can be produced from barley malt, though most commercial caramel color is corn-based."
+    },
+    "hydrolyzed vegetable protein": {
+      "may_contain": ["wheat", "gluten", "msg"],
+      "note": "Often wheat- or soy-derived, and a common source of free glutamates."
+    },
+    "hydrolyzed protein": {
+      "may_contain": ["wheat", "gluten", "msg"],
+      "note": "Source is frequently undisclosed; often wheat or soy."
+    },
+    "yeast extract": {
+      "may_contain": ["gluten", "msg"],
+      "note": "May be grown on barley and contains naturally occurring glutamates."
+    },
+    "spices": {
+      "may_contain": ["gluten", "wheat"],
+      "note": "Spice blends can use wheat flour as an anti-caking agent."
+    },
+    "seasoning": {
+      "may_contain": ["gluten", "wheat", "milk", "msg"],
+      "note": "Seasoning blends commonly contain undisclosed wheat or dairy carriers."
+    },
+    "broth": {
+      "may_contain": ["gluten", "wheat", "milk"],
+      "note": "Commercial broths often contain wheat-based thickeners."
+    },
+    "stock": {
+      "may_contain": ["gluten", "wheat"],
+      "note": "Commercial stocks often contain wheat-based thickeners."
+    },
+    "mono- and diglycerides": {
+      "may_contain": ["milk"],
+      "note": "Can be animal-derived, including from dairy fat."
+    },
+    "_removed_lecithin": "Deliberately NOT ambiguous. Lecithin is essentially always soy or sunflower, and even dairy-derived lecithin is a fat rather than a milk protein. Flagging it would fire on nearly every chocolate product and train users to dismiss warnings - which costs more safety than it buys.",
+    "flour": {
+      "may_contain": ["wheat", "gluten"],
+      "note": "Unqualified 'flour' means wheat flour under US labelling convention."
+    },
+    "starch": {
+      "may_contain": ["wheat", "gluten"],
+      "note": "Unqualified starch may be wheat-derived."
+    },
+    "vegetable protein": {
+      "may_contain": ["wheat", "gluten"],
+      "note": "Often wheat- or soy-derived."
+    },
+    "surimi": {
+      "may_contain": ["shellfish", "wheat", "gluten"],
+      "note": "Imitation crab is fish-based but commonly contains crab extract and wheat starch."
+    }
+  }
+}

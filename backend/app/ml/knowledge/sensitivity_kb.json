@@ -1,0 +1,100 @@
+{
+  "_README": {
+    "purpose": "The conditions Pona can check, and the ingredients that trigger them.",
+    "SCOPE_RULE": "Pona answers exactly one question: 'does this food contain something I personally react to?' It does NOT rate food as healthy or unhealthy, and it does not give dietary advice for managing a disease. An entry qualifies only if ALL of: (1) it is a reaction to a specific identifiable INGREDIENT, never a food category like 'red meat' or 'fried food'; (2) the mechanism is supported by scientific evidence and reflected in food-regulator guidance; (3) stating it does not require judging the food itself.",
+    "REMOVED_AND_WHY": {
+      "MSG sensitivity": "The reported symptom cluster originates in a 1968 anecdote and has not been reproduced in controlled double-blind trials. FDA classifies MSG as generally recognized as safe. Asserting the effect would spread a claim the evidence does not support, and the original framing carries a well-documented racist history.",
+      "Gout": "Dietary management of a diagnosed disease, not an ingredient sensitivity, and it worked by flagging broad categories ('red meat', 'organ meat'). Genetics drive urate far more than diet does. Out of scope.",
+      "GERD default trigger list": "Reflux triggers are highly individual and current guidance favours identifying your own triggers over avoiding foods as a group. The condition remains, with the user supplying their own triggers."
+    },
+    "STATUS": "SEED DATA - NOT CLINICALLY REVIEWED. This file governs allergen safety decisions and must be reviewed by a qualified dietitian or allergist before any real user relies on it.",
+    "SOURCE_OF_TRUTH": "This file is hand-curated source, not a generated artifact. notebooks/run_analysis.py reads it; nothing regenerates it."
+  },
+
+  "Peanut allergy": {
+    "ingredients": ["peanuts"],
+    "cross_contamination_risk": ["tree nuts"],
+    "severity": "high",
+    "explanation": "Contains peanuts. Peanut is an FDA major allergen and reactions can be severe.",
+    "prevalence": "1-2% of population"
+  },
+  "Tree nut allergy": {
+    "ingredients": ["tree nuts", "almonds", "walnuts", "cashews"],
+    "cross_contamination_risk": ["peanuts"],
+    "severity": "high",
+    "explanation": "Contains tree nuts. Tree nuts are an FDA major allergen and reactions can be severe.",
+    "prevalence": "0.5-1% of population"
+  },
+  "Milk/Dairy allergy": {
+    "ingredients": ["milk", "cheese", "butter", "cream", "casein", "whey", "lactose"],
+    "severity": "high",
+    "explanation": "Contains milk protein. This is an immune reaction to the protein, which is different from lactose intolerance.",
+    "prevalence": "2-3% of children, 0.3% of adults"
+  },
+  "Egg allergy": {
+    "ingredients": ["egg"],
+    "severity": "high",
+    "explanation": "Contains egg. Egg is an FDA major allergen.",
+    "prevalence": "1-2% of children, most outgrow it"
+  },
+  "Fish allergy": {
+    "ingredients": ["fish"],
+    "severity": "high",
+    "explanation": "Contains fish. Fish is an FDA major allergen and is often lifelong.",
+    "prevalence": "~0.4% of adults"
+  },
+  "Shellfish allergy": {
+    "ingredients": ["shellfish", "shrimp", "crab", "lobster"],
+    "severity": "high",
+    "explanation": "Contains crustacean shellfish. This is an FDA major allergen and reactions can be severe.",
+    "prevalence": "0.5-2.5% of population"
+  },
+  "Soy allergy": {
+    "ingredients": ["soy"],
+    "severity": "high",
+    "explanation": "Contains soy. Soy is an FDA major allergen.",
+    "prevalence": "~0.4% of population"
+  },
+  "Sesame allergy": {
+    "ingredients": ["sesame"],
+    "severity": "high",
+    "explanation": "Contains sesame. Sesame became the 9th FDA major allergen in 2023 and must now be declared on US labels.",
+    "prevalence": "~0.2% of population"
+  },
+  "Wheat allergy": {
+    "ingredients": ["wheat"],
+    "severity": "high",
+    "explanation": "Contains wheat. Wheat is an FDA major allergen. This is an allergy to wheat protein, which is distinct from celiac disease.",
+    "prevalence": "0.2-1% of population"
+  },
+
+  "Celiac disease": {
+    "ingredients": ["gluten", "wheat", "barley", "rye"],
+    "severity": "high",
+    "explanation": "Contains gluten. Celiac disease is an autoimmune condition, not an allergy or an intolerance, and it requires strict avoidance of wheat, barley and rye.",
+    "prevalence": "~1% of population",
+    "note": "The FDA 'gluten-free' label means under 20 parts per million."
+  },
+  "Lactose intolerance": {
+    "ingredients": ["lactose", "milk"],
+    "severity": "medium",
+    "explanation": "Contains lactose. Lactose intolerance is dose-dependent, so the amount matters and many people tolerate some lactose without difficulty.",
+    "prevalence": "~65% of the global population has reduced lactase persistence",
+    "note": "Not an allergy. Aged cheese and yogurt are lower in lactose and are often tolerated."
+  },
+  "Sulfite sensitivity": {
+    "ingredients": ["sulfites", "sodium sulfite", "potassium sulfite"],
+    "severity": "medium",
+    "explanation": "Contains sulfites. The FDA requires sulfites to be declared at 10 parts per million or above because they can provoke asthma symptoms in some people with asthma.",
+    "prevalence": "5-10% of people with asthma"
+  },
+
+  "Acid reflux / GERD": {
+    "ingredients": [],
+    "severity": "medium",
+    "user_defined": true,
+    "explanation": "Reflux triggers differ a lot from person to person.",
+    "prevalence": "20-30% of adults in Western countries",
+    "note": "Pona does not assume a trigger list for reflux. Current guidance favours identifying your own triggers over avoiding foods as a group. Add the foods you personally react to and Pona will watch for those. Things some people report reacting to include coffee, chocolate, citrus, tomato, mint and alcohol - but this varies, and it may not apply to you."
+  }
+}

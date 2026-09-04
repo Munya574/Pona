@@ -26,7 +26,19 @@ data/processed/
 *.onnx
 *.h5
 *.pkl
+*.safetensors
 faiss_index/
+backend/app/ml/models/
+
+# NOTE: the sensitivity knowledge base is NOT here. It is hand-curated
+# source, not a derived artifact, and it lives with the code that needs it
+# in backend/app/ml/knowledge/. It used to be written into data/processed/,
+# which meant a fresh clone had no knowledge base at all and silently
+# cleared every allergen. Keep it out of ignored directories.
+
+# Local database
+*.db
+*.sqlite3
 
 # OS
 .DS_Store

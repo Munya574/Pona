@@ -121,40 +121,26 @@ print("\n" + "=" * 80)
 print("PHASE 3: INGREDIENT SYNONYM MAPPING")
 print("=" * 80)
 
-INGREDIENT_SYNONYMS = {
-    # Dairy
-    "milk": ["whole milk", "skim milk", "low-fat milk", "milk solids", "whey", "milk-powder", "powdered milk"],
-    "cheese": ["cheddar", "mozzarella", "parmesan", "gouda", "cream cheese"],
-    "butter": ["butterfat", "milk fat", "ghee"],
-    "cream": ["heavy cream", "sour cream", "whipped cream", "creme", "crème"],
-    "casein": ["sodium caseinate", "calcium caseinate", "milk casein", "casein hydrolysate"],
-    "lactose": ["milk sugar"],
+KNOWLEDGE_DIR = Path("../backend/app/ml/knowledge")
 
-    # Nuts & Seeds
-    "peanuts": ["groundnuts", "arachis oil", "peanut-flour", "groundnut"],
-    "tree nuts": ["almonds", "walnuts", "cashews", "pistachios", "pecans", "hazelnuts", "macadamia"],
-    "sesame": ["tahini", "sesame oil", "sesame-seeds"],
 
-    # Gluten
-    "gluten": ["wheat gluten", "hydrolyzed wheat protein", "wheat-gluten", "gluten-powder"],
-    "wheat": ["wheat starch", "wheat germ", "wheat-flour", "durum wheat"],
+def load_knowledge(name):
+    """
+    Read a hand-curated knowledge file.
 
-    # Soy
-    "soy": ["soybean", "soy sauce", "soy lecithin", "soy-oil", "soy-flour"],
+    These files are SOURCE, not output. This script used to define them as
+    hardcoded literals and write them into data/processed/, which was wrong
+    twice over: nothing here is actually derived from the Open Food Facts
+    data, and data/processed/ is gitignored, so a fresh clone had no
+    knowledge base and the app silently cleared every allergen. The app owns
+    them now; this script reads them.
+    """
+    with open(KNOWLEDGE_DIR / name, encoding="utf-8") as f:
+        data = json.load(f)
+    return {k: v for k, v in data.items() if not k.startswith("_")}
 
-    # Seafood
-    "fish": ["salmon", "tuna", "cod", "anchovy", "fish sauce", "fish oil"],
-    "shellfish": ["shrimp", "crab", "lobster", "oyster", "clam", "mussel"],
 
-    # Additives & Chemicals
-    "sulfites": ["sodium sulfite", "potassium sulfite", "sodium bisulfite", "sulfur dioxide"],
-    "msg": ["monosodium glutamate", "glutamate", "yeast extract"],
-    "citric acid": ["citrate", "citrus acid"],
-    "caffeine": ["coffee extract", "caffeine anhydrous"],
-    "high fructose corn syrup": ["hfcs", "corn syrup", "glucose syrup"],
-    "salt": ["sodium chloride", "sea salt", "table salt"],
-    "sugar": ["glucose", "fructose", "sucrose", "dextrose", "cane sugar"],
-}
+INGREDIENT_SYNONYMS = load_knowledge("ingredient_synonyms.json")
 
 variant_to_canonical = {}
 for canonical, variants in INGREDIENT_SYNONYMS.items():
@@ -174,86 +160,36 @@ print("\n" + "=" * 80)
 print("PHASE 4: SENSITIVITY KNOWLEDGE BASE")
 print("=" * 80)
 
-SENSITIVITY_KB = {
-    # Immune-mediated allergies
-    "Peanut allergy": {
-        "ingredients": ["peanuts"],
-        "keywords": ["groundnuts", "arachis"],
-        "cross_contamination_risk": ["tree nuts"],
-        "severity": "high",
-        "explanation": "Contains peanuts (legume allergen). Can trigger anaphylaxis.",
-        "prevalence": "1-2% of population",
-    },
-    "Tree nut allergy": {
-        "ingredients": ["tree nuts", "almonds", "walnuts", "cashews"],
-        "cross_contamination_risk": ["peanuts"],
-        "severity": "high",
-        "explanation": "Contains tree nuts. Can trigger severe allergic reaction.",
-        "prevalence": "0.5-1% of population",
-    },
-    "Milk/Dairy allergy": {
-        "ingredients": ["milk", "cheese", "butter", "cream", "casein", "whey", "lactose"],
-        "keywords": ["dairy"],
-        "severity": "high",
-        "explanation": "Contains milk proteins (immune-mediated). Different from lactose intolerance.",
-        "prevalence": "2-3% of children, 0.3% of adults",
-    },
-    "Wheat/Gluten allergy": {
-        "ingredients": ["wheat", "gluten"],
-        "severity": "high",
-        "explanation": "Contains gluten or wheat. Can trigger celiac-like reactions.",
-        "prevalence": "0.1% celiac disease, 0.5-1% non-celiac gluten sensitivity",
-    },
-    "Shellfish allergy": {
-        "ingredients": ["shellfish", "shrimp", "crab", "lobster"],
-        "severity": "high",
-        "explanation": "Contains shellfish. Can trigger severe allergic reaction.",
-        "prevalence": "0.5-2.5% of population (most common adult allergy)",
-    },
+# SCOPE RULE (deliberate, do not widen without a reason):
+#
+# Pona answers exactly one question: "does this food contain something
+# I personally react to?" It does NOT rate food as healthy or unhealthy,
+# and it does not give dietary advice for managing a disease.
+#
+# An entry qualifies only if ALL of the following hold:
+#   1. It is a reaction to a specific IDENTIFIABLE INGREDIENT, not to a
+#      food category ("red meat", "fried food", "processed food").
+#   2. The mechanism is supported by scientific evidence and reflected in
+#      food-regulator guidance (FDA major allergens, FDA sulfite labelling
+#      rule, FDA gluten-free labelling rule).
+#   3. Stating it does not require judging the food itself.
+#
+# Removed under this rule, and why:
+#   - MSG sensitivity: the reported symptom cluster originates in a 1968
+#     anecdote and has not been reproduced in controlled double-blind
+#     trials. FDA classifies MSG as generally recognized as safe. Asserting
+#     the effect would spread a claim the evidence does not support, and
+#     the original framing carries a well-documented racist history.
+#   - Gout: this is dietary management of a diagnosed disease, not an
+#     ingredient sensitivity, and it worked by flagging broad categories
+#     ("red meat", "organ meat"). Genetics drive urate far more than diet.
+#     Out of scope.
+#   - GERD's default trigger list: reflux triggers are highly individual
+#     and current guidance favours the triggers a person identifies for
+#     themselves over blanket elimination. GERD stays, but as a condition
+#     the user fills in from their own experience (see custom triggers).
 
-    # Intolerances & Digestive
-    "Lactose intolerance": {
-        "ingredients": ["lactose", "milk"],
-        "severity": "medium",
-        "explanation": "Contains lactose. Causes bloating, cramps. Fermented/aged dairy often tolerated.",
-        "prevalence": "65% of human population (especially non-European ancestry)",
-        "note": "Context matters—yogurt & aged cheese usually OK",
-    },
-
-    # GERD / Acid Reflux
-    "Acid reflux / GERD": {
-        "ingredients": ["citric acid", "tomato", "caffeine", "chocolate", "mint", "spice"],
-        "keywords": ["acidic", "fried", "fatty", "acidic"],
-        "severity": "medium",
-        "explanation": "Contains GERD triggers: citric acid (reflux), caffeine (LES relaxation), fatty foods.",
-        "prevalence": "20-30% of Western population",
-    },
-
-    # Chemical Sensitivities
-    "Sulfite sensitivity": {
-        "ingredients": ["sulfites", "sodium sulfite", "potassium sulfite"],
-        "keywords": ["preservative"],
-        "severity": "low-medium",
-        "explanation": "Contains sulfites (preservative). Triggers asthma or reactions in ~5-10% of asthmatics.",
-        "prevalence": "5-10% in asthmatics",
-    },
-    "MSG sensitivity": {
-        "ingredients": ["msg"],
-        "keywords": ["yeast extract", "hydrolyzed protein"],
-        "severity": "low",
-        "explanation": "Contains MSG. May cause headaches, flushing, numbness.",
-        "prevalence": "~1% report sensitivity (controversial)",
-    },
-
-    # Metabolic conditions
-    "Gout": {
-        "ingredients": ["red meat", "organ meat", "shellfish", "anchovies"],
-        "keywords": ["purine"],
-        "severity": "medium",
-        "explanation": "High purine content. Can trigger gout attacks (elevated uric acid).",
-        "prevalence": "~4% of population (growing)",
-    },
-}
+SENSITIVITY_KB = load_knowledge("sensitivity_kb.json")
 
 print(f"\n  Built sensitivity knowledge base:")
 print(f"    • Conditions covered: {len(SENSITIVITY_KB)}")
@@ -274,7 +210,7 @@ print("    • Lactose intolerance: 65% of global population, especially:")
 print("      - East Asian populations (~90%)")
 print("      - West African populations (~90%)")
 print("      - Most non-European ancestry")
-print("    • Gout: Rising in developing countries (4% of population)")
+print("    • Celiac disease: ~1% globally, frequently undiagnosed")
 print("    • GERD: Major burden in Asia (20-30% in Western, higher in industrializing)")
 print("\n  Regional ingredient terminology:")
 print("    • 'Groundnuts' (Africa/Asia) = 'Peanuts' (North America)")
@@ -319,17 +255,16 @@ print(f"    • % of dataset: {len(dairy_products) / len(off_clean) * 100:.1f}%"
 print("PHASE 6: EXPORTING ARTIFACTS FOR ML PIPELINE")
 print("=" * 80)
 
-# 1. Ingredient synonyms
-with open(OUTPUT_DIR / "ingredient_synonyms.json", "w") as f:
-    json.dump(INGREDIENT_SYNONYMS, f, indent=2)
-print(f"\n  [OK] ingredient_synonyms.json ({len(INGREDIENT_SYNONYMS)} canonical forms)")
+# NOTE: the synonym map and the sensitivity KB are deliberately NOT written
+# here. They are hand-curated source owned by the app
+# (backend/app/ml/knowledge/), and this script only reads them. Writing them
+# back out is what previously destroyed hand-edits on every run.
+print(f"\n  [--] ingredient_synonyms.json - source, read-only "
+      f"({len(INGREDIENT_SYNONYMS)} canonical forms)")
+print(f"  [--] sensitivity_kb.json - source, read-only "
+      f"({len(SENSITIVITY_KB)} conditions)")
 
-# 2. Sensitivity KB
-with open(OUTPUT_DIR / "sensitivity_kb.json", "w") as f:
-    json.dump(SENSITIVITY_KB, f, indent=2)
-print(f"  [OK] sensitivity_kb.json ({len(SENSITIVITY_KB)} conditions)")
-
-# 3. Ingredient frequency
+# 1. Ingredient frequency
 ingredient_freq_sorted = dict(sorted(ingredient_freq.items(), key=lambda x: x[1], reverse=True))
 with open(OUTPUT_DIR / "ingredient_frequency.json", "w") as f:
     json.dump(ingredient_freq_sorted, f, indent=2)
