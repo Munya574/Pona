@@ -89,6 +89,11 @@ for canonical, variants in INGREDIENT_SYNONYMS.items():
 # Hidden forms are label terms that ARE an allergen but share no obvious word
 # with it ("semolina" is wheat). They behave exactly like synonyms.
 for canonical, forms in INGREDIENT_RULES.get("hidden_forms", {}).items():
+    # Skip the _note keys that document this file. Without this guard a
+    # string value would be iterated character by character, mapping single
+    # letters to a canonical allergen.
+    if canonical.startswith("_") or not isinstance(forms, list):
+        continue
     VARIANT_TO_CANONICAL.setdefault(canonical.lower(), canonical)
     for form in forms:
         VARIANT_TO_CANONICAL[form.lower()] = canonical
@@ -178,6 +183,45 @@ def parse_ingredient_list(raw: str) -> List[str]:
         if p:
             out.append(p)
     return out
+
+
+# Precautionary allergen labelling. "May contain peanuts" is a statement
+# about cross-contamination risk, not an ingredient list — the peanut may
+# not be in the product at all. Reporting it as a confirmed ingredient
+# overstates what the label says.
+#
+# It still matters, especially for a severe allergy, so it is surfaced —
+# just as "possible" rather than "confirmed", which is exactly the
+# distinction the label itself is drawing.
+_PRECAUTIONARY_RE = re.compile(
+    r"\b("
+    r"may\s+(also\s+)?contain(\s+traces?\s+(of\s+)?)?"
+    r"|(may\s+contain\s+)?traces?\s+of"
+    r"|produced\s+in\s+a\s+facility"
+    r"|manufactured\s+in\s+a\s+facility"
+    r"|made\s+in\s+a\s+facility"
+    r"|processed\s+in\s+a\s+facility"
+    r"|packed\s+in\s+a\s+facility"
+    r"|(manufactured|made|processed)\s+on\s+(shared\s+)?equipment"
+    r"|shared\s+equipment"
+    r")\b",
+    re.IGNORECASE,
+)
+
+
+def split_precautionary(raw: str) -> Tuple[str, str]:
+    """
+    Separate the ingredient list from any "may contain" statement.
+
+    Returns (definite_text, precautionary_text). Everything from the first
+    precautionary marker onward is treated as precautionary, which matches
+    how these statements are written — they come after the ingredients and
+    run to the end.
+    """
+    m = _PRECAUTIONARY_RE.search(raw)
+    if not m:
+        return raw, ""
+    return raw[:m.start()], raw[m.end():]
 
 
 def _singular(word: str) -> str:
@@ -598,13 +642,40 @@ def get_verdict(
     """
     personal_triggers = personal_triggers or []
 
-    # Step 1: Normalize
-    normalized_ingredients = normalize_ingredients(raw_ingredients)
+    # Step 1: Split "may contain" statements off the ingredient list, then
+    # normalise each part. A precautionary allergen is reported, but as a
+    # possibility rather than as an ingredient that is definitely present.
+    definite_raw, precaution_raw = [], []
+    for raw in raw_ingredients:
+        d, p = split_precautionary(raw)
+        if d.strip():
+            definite_raw.append(d)
+        if p.strip():
+            precaution_raw.append(p)
+
+    normalized_ingredients = normalize_ingredients(definite_raw)
+    precautionary_ingredients = [
+        i for i in normalize_ingredients(precaution_raw)
+        if i not in normalized_ingredients
+    ]
 
     # Step 2: Match
     triggers, unchecked = match_ingredients_to_sensitivities(
         normalized_ingredients, user_sensitivities
     )
+
+    # Step 2a: Precautionary allergens -> possible, never confirmed.
+    precaution_triggers, _ = match_ingredients_to_sensitivities(
+        precautionary_ingredients, user_sensitivities
+    )
+    for t in precaution_triggers:
+        t.confidence = "possible"
+        t.explanation = (
+            f"The label says this may contain {t.ingredient} through shared "
+            f"equipment or facilities. It is a cross-contamination warning, "
+            f"not a listed ingredient."
+        )
+    triggers.extend(precaution_triggers)
 
     # Step 2a: The user's own trigger list.
     triggers.extend(match_personal_triggers(
