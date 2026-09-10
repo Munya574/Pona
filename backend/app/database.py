@@ -24,6 +24,13 @@ DATABASE_URL = os.getenv(
     "sqlite:///./pona.db"  # Creates pona.db in current directory
 )
 
+# Render, Heroku and Railway hand out URLs beginning "postgres://".
+# SQLAlchemy 2.0 removed that alias and raises NoSuchModuleError on it, so
+# the app crashes at import with an error that says nothing about the URL.
+# Normalise it rather than making the next person rediscover this.
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
 # ── Engine: Connection pool to database ────────────────────────────────────────
 # Why create_engine?
 # - Manages connection pooling (reuses connections instead of creating new ones)

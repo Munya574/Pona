@@ -183,6 +183,135 @@ for s in samples:
         check(word not in text, f"evaluative language {word!r} in: {text[:90]}")
 print(f"  {len(samples)} results checked for diet-culture language")
 
+# ── 6f. Judgment calls, recorded so they are changed deliberately ────────────
+
+print("\n[6f] Contested cases resolved deliberately, not by accident")
+
+# OATS + CELIAC. Oats contain no gluten, but are usually grown and milled
+# with wheat. Flagged as 'possible' rather than 'confirmed': saying an oat
+# product "contains gluten" is factually wrong, while saying nothing is
+# unsafe. The explanation carries the certified-gluten-free guidance.
+for oat in ["whole grain oats", "oat fiber", "rolled oats", "oatmeal"]:
+    r = get_verdict([oat], ["Celiac disease"])
+    check(bool(r["triggers"]), f"oats not flagged for celiac: {oat!r}")
+    check(
+        all(t["confidence"] == "possible" for t in r["triggers"]),
+        f"oats reported as confirmed gluten, which is factually wrong: {oat!r}",
+    )
+    check(
+        "certified gluten-free" in r["triggers"][0]["explanation"],
+        "oats flagged without telling the user certified gluten-free oats exist",
+    )
+
+# ...but oats certified gluten-free are produced to avoid that contamination.
+for oat in ["gluten-free oats", "certified gluten free oats"]:
+    r = get_verdict([oat], ["Celiac disease"])
+    check(not r["triggers"], f"certified gluten-free oats wrongly flagged: {oat!r}")
+
+# COCONUT is deliberately NOT a tree nut. The FDA classifies it as one for
+# labelling, but that is a labelling convention, not a clinical finding:
+# coconut allergy is uncommon and largely independent of tree nut allergy.
+# Measured on 14,798 real products, following the FDA made 860 of 1,073
+# tree-nut flags coconut products - noise that teaches people to dismiss
+# warnings, which costs more safety than it buys.
+for c in ["coconut", "coconut oil", "coconut flour", "shredded coconut",
+          "coconut milk", "coconut water"]:
+    r = get_verdict([c], ["Tree nut allergy"])
+    check(not r["triggers"], f"coconut flagged as a tree nut: {c!r}")
+
+# ...and coconut is still not dairy, whatever its name suggests.
+for c in ["coconut milk", "coconut cream"]:
+    r = get_verdict([c], ["Milk/Dairy allergy"])
+    check(not r["triggers"], f"coconut wrongly flagged as dairy: {c!r}")
+
+# A real tree nut alongside coconut must still be caught - clearing coconut
+# must not clear the product.
+r = get_verdict(["coconut oil, almonds, sugar"], ["Tree nut allergy"])
+check(bool(r["triggers"]), "coconut cleared the whole product; almonds missed")
+
+# The rare person who DOES react to coconut is served by their own trigger
+# list, so this decision costs them nothing.
+r = get_verdict(
+    ["coconut oil, sugar"],
+    ["Tree nut allergy"],
+    personal_triggers=[{"ingredient": "coconut", "condition": "Tree nut allergy"}],
+)
+check(
+    any(t["ingredient"] == "coconut" for t in r["triggers"]),
+    "a user who listed coconut as their own trigger was not warned",
+)
+
+# CREAMER. US labelling permits "non-dairy" on a product containing sodium
+# caseinate, a milk protein. Ambiguous rather than confirmed.
+for c in ["creamer", "non-dairy creamer"]:
+    r = get_verdict([c], ["Milk/Dairy allergy"])
+    check(bool(r["triggers"]), f"creamer not flagged at all: {c!r}")
+    check(
+        all(t["confidence"] == "possible" for t in r["triggers"]),
+        f"creamer reported as confirmed dairy: {c!r}",
+    )
+print("  oats, coconut and creamer resolved as recorded in ingredient_rules.json")
+
+# ── 6g. Unspaced compounds ───────────────────────────────────────────────────
+
+print("\n[6g] Labels that run words together")
+
+# Found by benchmarking: "wheatflour" was missed while "wheat flour" matched.
+for compound in ["wheatflour", "wholewheat", "wheatstarch"]:
+    r = get_verdict([compound], ["Celiac disease"])
+    check(bool(r["triggers"]), f"unspaced compound missed: {compound!r}")
+
+# These are listed explicitly rather than by substring matching, which would
+# reintroduce exactly the false positives section 3 guards against.
+r = get_verdict(["cocoa butter"], ["Milk/Dairy allergy"])
+check(not r["triggers"], "substring matching crept back in: cocoa butter -> dairy")
+print("  unspaced forms matched without resorting to substring matching")
+
+# ── 6e. Precautionary labelling ("may contain") ──────────────────────────────
+
+print("\n[6e] 'May contain' is a warning, not an ingredient")
+
+# Found by benchmarking against real products: a label reading
+# ". may contain soybeans." was being reported as confirmed soy. The
+# allergen may not be in the product at all - it is a cross-contamination
+# statement, and reporting it as an ingredient overstates the label.
+precautionary = [
+    "Sugar, cocoa butter. May contain traces of peanuts.",
+    "Sugar, cocoa. May also contain peanuts.",
+    "Rice, salt. Traces of peanuts.",
+    "Oats, salt. Produced in a facility that also processes peanuts.",
+    "Oats, salt. Manufactured on shared equipment with peanuts.",
+]
+for label in precautionary:
+    r = get_verdict([label], ["Peanut allergy"])
+    confs = [t["confidence"] for t in r["triggers"]]
+    check(bool(r["triggers"]), f"precautionary allergen not surfaced at all: {label!r}")
+    check(
+        "confirmed" not in confs,
+        f"'may contain' reported as a confirmed ingredient: {label!r}",
+    )
+    check(
+        r["verdict"] == "possible_triggers",
+        f"expected possible_triggers for {label!r}, got {r['verdict']}",
+    )
+
+# ...but an allergen actually in the list is still confirmed.
+r = get_verdict(["Peanuts, sugar, salt."], ["Peanut allergy"])
+check(
+    r["verdict"] == "contains_trigger",
+    "a listed ingredient was downgraded to possible",
+)
+
+# An ingredient present AND repeated in a may-contain line stays confirmed.
+r = get_verdict(
+    ["Peanuts, sugar. May contain traces of peanuts."], ["Peanut allergy"]
+)
+check(
+    any(t["confidence"] == "confirmed" for t in r["triggers"]),
+    "listed peanuts downgraded because a may-contain line also mentioned them",
+)
+print(f"  {len(precautionary)} precautionary forms -> possible, not confirmed")
+
 # ── 6c. User-defined conditions ──────────────────────────────────────────────
 
 print("\n[6c] Conditions with individual triggers use the USER's list")

@@ -13,8 +13,10 @@
       "matzah", "panko", "rusk", "graham flour", "enriched flour",
       "bleached flour", "unbleached flour", "all-purpose flour", "bread flour",
       "cake flour", "pastry flour", "self-rising flour", "wheat starch",
-      "wheat bran", "wheat germ", "hydrolyzed wheat protein", "farro"
+      "wheat bran", "wheat germ", "hydrolyzed wheat protein", "farro",
+      "wheatflour", "wheatstarch", "wholewheat", "wheatgerm"
     ],
+    "_unspaced_note": "Labels sometimes run words together ('wheatflour'). Token matching needs the exact form, so common unspaced compounds are listed explicitly rather than by falling back to substring matching, which would reintroduce false positives like 'cocoa butter' -> butter.",
     "gluten": [
       "seitan", "vital wheat gluten", "malt", "malt extract", "malt syrup",
       "malted barley", "barley malt", "barley", "rye", "brewer's yeast"
@@ -45,6 +47,7 @@
       "nut paste", "filbert", "hazelnut", "macadamia", "brazil nut", "pine nut",
       "pignoli", "pili nut", "beechnut"
     ],
+    "_coconut_note": "Coconut is deliberately NOT treated as a tree nut. The FDA classifies it as one for labelling purposes, but that is a labelling convention rather than a clinical finding: coconut allergy is uncommon and largely independent of tree nut allergy, and most people with a tree nut allergy tolerate coconut. Following the FDA here was measured against 14,798 real products and made roughly one in three tree-nut flags a coconut product (860 of 1,073), which is the kind of noise that teaches people to dismiss warnings. Anyone who does react to coconut can add it as a personal trigger, which flags it precisely for them without alarming everyone else.",
     "shellfish": [
       "prawn", "prawns", "crayfish", "crawfish", "langoustine", "scampi",
       "krill", "scampi", "shrimp paste", "crab extract", "lobster extract"
@@ -88,9 +91,12 @@
     "water chestnut": ["tree nuts"],
     "nutritional yeast": ["tree nuts", "peanuts"],
     "coconut oil": ["milk", "lactose"],
-    "coconut flour": ["tree nuts"],
     "buckwheat": ["wheat", "gluten"],
     "buckwheat flour": ["wheat", "gluten"],
+    "gluten-free oats": ["gluten", "wheat"],
+    "gluten free oats": ["gluten", "wheat"],
+    "certified gluten-free oats": ["gluten", "wheat"],
+    "certified gluten free oats": ["gluten", "wheat"],
     "rice flour": ["wheat", "gluten"],
     "almond flour": ["wheat", "gluten"],
     "corn flour": ["wheat", "gluten"],
@@ -184,6 +190,23 @@
     "surimi": {
       "may_contain": ["shellfish", "wheat", "gluten"],
       "note": "Imitation crab is fish-based but commonly contains crab extract and wheat starch."
+    },
+    "oats": {
+      "may_contain": ["gluten", "wheat"],
+      "note": "Oats do not contain gluten themselves, but they are usually grown and milled alongside wheat and are commonly cross-contaminated. Oats labelled certified gluten-free are produced to avoid this and are tolerated by most people with celiac disease. A small number of people also react to oats themselves."
+    },
+    "_oat_forms_note": "Multi-word forms ('oat fiber', 'oat flour', 'rolled oats') are covered by the 'oats' entry, because token matching finds 'oat' inside them. Single-word compounds are not, so they need their own entry.",
+    "oatmeal": {
+      "may_contain": ["gluten", "wheat"],
+      "note": "Oats do not contain gluten themselves, but they are usually grown and milled alongside wheat and are commonly cross-contaminated. Oats labelled certified gluten-free are produced to avoid this and are tolerated by most people with celiac disease. A small number of people also react to oats themselves."
+    },
+    "oatflour": {
+      "may_contain": ["gluten", "wheat"],
+      "note": "Oats do not contain gluten themselves, but they are usually grown and milled alongside wheat and are commonly cross-contaminated. Oats labelled certified gluten-free are produced to avoid this and are tolerated by most people with celiac disease. A small number of people also react to oats themselves."
+    },
+    "creamer": {
+      "may_contain": ["milk", "casein"],
+      "note": "Coffee creamers, including ones labelled non-dairy, frequently contain sodium caseinate, which is a milk protein. US labelling allows 'non-dairy' on a product containing caseinate."
     }
   }
 }

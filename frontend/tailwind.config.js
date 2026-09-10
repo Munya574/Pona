@@ -6,10 +6,12 @@ export default {
   ],
   theme: {
     extend: {
+      // Named after what Pona FOUND, not a judgement on the food.
+      // The old names (safe/caution/unsafe) rated the food itself.
       colors: {
-        safe: '#22c55e',
-        caution: '#f59e0b',
-        unsafe: '#ef4444',
+        clear: '#22c55e',     // no triggers found
+        possible: '#f59e0b',  // possible triggers
+        present: '#ef4444',   // contains something you listed
       },
     },
   },

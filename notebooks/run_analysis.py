@@ -90,11 +90,24 @@ for ingredient, count in ingredient_freq.most_common(20):
     print(f"    {ingredient}: {count:,} ({pct:.1f}%)")
 
 # Extract allergens
-off_with_allergens = off_clean.dropna(subset=["allergens_en"])
+#
+# NOTE: read `allergens`, not `allergens_en`. In this export allergens_en is
+# empty in every row, so the previous version of this script silently
+# produced an empty allergen analysis (allergen_frequency.json was "{}").
+# The populated column is `allergens`, holding EU-14 taxonomy tags like
+# "en:milk,en:gluten,en:soybeans".
+ALLERGEN_COL = "allergens"
+if off_clean[ALLERGEN_COL].notna().sum() == 0:
+    raise RuntimeError(
+        f"Column {ALLERGEN_COL!r} is empty for every row. Check the export's "
+        f"schema before trusting any allergen numbers below."
+    )
+
+off_with_allergens = off_clean.dropna(subset=[ALLERGEN_COL])
 all_allergens = []
-for tags in off_with_allergens["allergens_en"]:
+for tags in off_with_allergens[ALLERGEN_COL]:
     if pd.notna(tags):
-        allergens = [al.strip() for al in str(tags).split(",")]
+        allergens = [al.strip() for al in str(tags).split(",") if al.strip()]
         all_allergens.extend(allergens)
 
 allergen_freq = Counter(all_allergens)

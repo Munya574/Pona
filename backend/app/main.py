@@ -8,9 +8,11 @@ FastAPI app that serves:
 - Substitutions (placeholder for now)
 """
 
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import scan, verdict, profile, substitutions
+from app.routers import scan, verdict, profile, substitutions, conditions
 from app.database import init_db
 
 app = FastAPI(
@@ -38,9 +40,19 @@ async def startup_event():
 # - Without CORS, browser blocks the request for security
 # - We allow localhost for development, restrict in production
 
+# Local dev origins, plus whatever the deployment sets. CORS_ORIGINS is a
+# comma-separated list, e.g. "https://pona.vercel.app".
+#
+# Deliberately not "*": a wildcard here would let any site call this API
+# with a user's profile id and read their health conditions back.
+_DEFAULT_ORIGINS = ["http://localhost:5173", "http://localhost:3000"]
+_EXTRA_ORIGINS = [
+    o.strip() for o in os.getenv("CORS_ORIGINS", "").split(",") if o.strip()
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_origins=_DEFAULT_ORIGINS + _EXTRA_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -53,6 +65,7 @@ app.add_middleware(
 app.include_router(scan.router, prefix="/scan", tags=["scan"])
 app.include_router(verdict.router, prefix="/verdict", tags=["verdict"])
 app.include_router(profile.router, prefix="/profile", tags=["profile"])
+app.include_router(conditions.router, prefix="/conditions", tags=["conditions"])
 app.include_router(substitutions.router, prefix="/substitutions", tags=["substitutions"])
 
 
@@ -75,7 +88,8 @@ async def print_startup():
     print("  POST   /profile           - Create sensitivity profile")
     print("  GET    /profile/{id}      - Get profile details")
     print("  PUT    /profile/{id}      - Update profile")
-    print("  POST   /verdict           - Get safe/unsafe verdict")
+    print("  GET    /conditions        - List checkable conditions")
+    print("  POST   /verdict           - Check a food against a profile")
     print("  POST   /scan/photo        - Scan food from photo (stub)")
     print("  POST   /scan/ocr          - Scan food from label (stub)")
     print("  POST   /scan/url          - Scan food from recipe (stub)")

@@ -7,16 +7,22 @@ python-dotenv==1.0.0
 pydantic==2.5.0
 pydantic-settings==2.1.0
 
-# ML
-torch==2.1.1
-torchvision==0.16.1
-transformers==4.35.2
-faiss-cpu==1.7.4
-
-# OCR
+# OCR (label photo -> text). Needs the Tesseract binary installed separately.
 pillow==10.1.0
 pytesseract==0.3.10
 
-# Web scraping
+# Web scraping (recipe URLs)
 httpx==0.25.2
 beautifulsoup4==4.12.2
+
+# NOTE: torch, torchvision, transformers and faiss-cpu were removed.
+#
+# They were here for a fine-tuned DistilBERT ingredient normalizer. That
+# model was trained and evaluated, and it scored F1 = 0.0. The rule-based
+# matcher that replaced it scores 95.7% recall on 14,798 real products
+# (see notebooks/benchmark_matcher.py), is auditable, and needs no model
+# at runtime.
+#
+# Nothing in the app imports them any more, and they are ~2GB of install
+# for a dependency that would only make the results harder to explain.
+# Do not re-add them without a benchmark showing they beat the rules.

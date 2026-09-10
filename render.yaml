@@ -1,0 +1,34 @@
+# Render blueprint for the Pona API.
+#
+# Declared here rather than clicked together in the dashboard so the
+# deployment is reproducible and reviewable. Render reads this on
+# "New > Blueprint".
+#
+# The frontend is NOT here: it is static files and belongs on a CDN host
+# (Vercel / Cloudflare Pages), which is free and has no cold start.
+
+services:
+  - type: web
+    name: pona-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    # Render restarts the service if this stops answering.
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: pona-db
+          property: connectionString
+      # Set manually AFTER the frontend is deployed and has a URL.
+      # Without it the browser blocks every API call, and the failure
+      # shows up as a generic network error rather than a CORS message.
+      - key: CORS_ORIGINS
+        sync: false
+
+databases:
+  - name: pona-db
+    plan: free
+    # NOTE: Render's free Postgres is deleted after 90 days. Fine for
+    # testing; move to a paid plan, Neon or Supabase before it matters.
