@@ -3,6 +3,7 @@ import Onboarding from './pages/Onboarding'
 import Scan from './pages/Scan'
 import Result from './pages/Result'
 import Profile from './pages/Profile'
+import ChefCard from './pages/ChefCard'
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
         <Route path="/scan" element={<Scan />} />
         <Route path="/result" element={<Result />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/card" element={<ChefCard />} />
       </Routes>
     </div>
   )

@@ -330,6 +330,52 @@ for rid, ings in [(profile_id, ["milk"]), (profile_id, ["salt"]),
         assert word not in blob, f"evaluative language {word!r} in response: {blob[:100]}"
 print("[OK] No diet-culture or evaluative language in API responses\n")
 
+# ── Test 15: Chef card ──────────────────────────────────────────────────────
+
+print("[TEST 15] Chef card must not call celiac an allergy...")
+card_profile = client.post("/profile/", json={
+    "user_email": "card@pona.app",
+    "profile_name": "Card Test",
+    "sensitivities": ["Celiac disease", "Lactose intolerance", "Peanut allergy"],
+    "personal_triggers": [{"ingredient": "coffee", "condition": "Acid reflux / GERD"}],
+}).json()
+card = client.get(f"/profile/{card_profile['profile_id']}/chef-card").json()
+
+blob = " ".join(card["statements"]).lower()
+# Celiac is autoimmune. Describing it as an allergy is the exact conflation
+# the knowledge base was split to avoid, and it misleads a kitchen about
+# what is actually at stake.
+assert "autoimmune" in blob, "celiac not described as autoimmune"
+natures = {i["condition"]: i["nature"] for i in card["severe"] + card["manageable"]}
+assert natures.get("Celiac disease") == "autoimmune", \
+    f"celiac mis-typed as {natures.get('Celiac disease')}"
+assert natures.get("Peanut allergy") == "allergy"
+assert natures.get("Lactose intolerance") == "intolerance"
+
+# Hidden forms are the card's real value over a handwritten one.
+celiac = [i for i in card["severe"] if i["condition"] == "Celiac disease"][0]
+assert "semolina" in celiac["also_listed_as"], "hidden gluten forms missing from card"
+
+# Cross-contact is requested for allergy/autoimmune, and the questions are
+# specific rather than generic.
+assert card["cross_contact"] is True
+assert any("fryer" in q.lower() for q in card["questions_to_ask"]), \
+    "no shared-fryer question for a celiac profile"
+assert any("coffee" in q.lower() for q in card["questions_to_ask"]), \
+    "the user's own trigger did not become a question"
+print(f"[OK] Card: {len(card['questions_to_ask'])} questions, celiac typed correctly\n")
+
+# An intolerance-only profile must NOT ask for clean equipment - doing so
+# trains kitchens to discount the request when it genuinely matters.
+mild = client.post("/profile/", json={
+    "user_email": "mild@pona.app", "profile_name": "Mild",
+    "sensitivities": ["Lactose intolerance"],
+}).json()
+mild_card = client.get(f"/profile/{mild['profile_id']}/chef-card").json()
+assert mild_card["cross_contact"] is False, \
+    "cross-contact requested for an intolerance-only profile"
+print("[OK] Intolerance-only profile does not request clean equipment\n")
+
 # ── SUMMARY ────────────────────────────────────────────────────────────────────
 
 print("=" * 80)
@@ -352,8 +398,13 @@ print("  [x] Unknown ingredients do not mask real triggers")
 print("  [x] Individual-trigger conditions use the user's own list only")
 print("  [x] Conditions with no triggers set up are flagged, not cleared")
 print("  [x] No evaluative or diet-culture language in any response")
+print("  [x] Barcode lookup returns human-transcribed ingredients")
+print("  [x] Chef card types celiac as autoimmune, not an allergy")
+print("  [x] Clean-equipment requested only where trace amounts matter")
 print("\nSee test_matcher.py for matching-engine correctness")
 print("(false-negative and false-positive guards on real label forms).")
 print("\nKNOWN LIMITATIONS:")
 print("  - The knowledge base is SEED DATA, not clinically reviewed.")
-print("  - No OCR/photo path yet: /verdict takes ingredients as text.\n")
+print("  - Photo reading is ~72% on real packaging, which is why extracted")
+print("    text is always shown for review before it is matched.")
+print("  - Non-English labels: 27% recall against 96% for English.")

@@ -48,7 +48,12 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).parent.parent / "backend"))
 from app.ml.matcher import SENSITIVITY_KB, get_verdict  # noqa: E402
 
-OFF_PATH = Path(__file__).parent.parent / "data" / "raw" / "en.openfoodfacts.org.products.csv"
+from off_data import find_off_csv  # noqa: E402
+
+try:
+    OFF_PATH = find_off_csv()
+except FileNotFoundError:
+    OFF_PATH = None
 
 # Open Food Facts uses the EU-14 allergen taxonomy. Pona's knowledge base is
 # built to the FDA major allergens, so the two overlap but do not coincide.
@@ -138,7 +143,7 @@ def detected_conditions(ingredients_text: str):
 
 
 def main(rows: int) -> int:
-    if not OFF_PATH.exists():
+    if OFF_PATH is None or not OFF_PATH.exists():
         print(f"ERROR: Open Food Facts export not found at {OFF_PATH}")
         print("This benchmark needs the 13GB raw dataset, which is not in the repo.")
         return 1

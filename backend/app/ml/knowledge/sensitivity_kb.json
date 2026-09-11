@@ -15,6 +15,7 @@
     "ingredients": ["peanuts"],
     "cross_contamination_risk": ["tree nuts"],
     "severity": "high",
+    "nature": "allergy",
     "explanation": "Contains peanuts. Peanut is an FDA major allergen and reactions can be severe.",
     "prevalence": "1-2% of population"
   },
@@ -22,48 +23,56 @@
     "ingredients": ["tree nuts", "almonds", "walnuts", "cashews"],
     "cross_contamination_risk": ["peanuts"],
     "severity": "high",
+    "nature": "allergy",
     "explanation": "Contains tree nuts. Tree nuts are an FDA major allergen and reactions can be severe.",
     "prevalence": "0.5-1% of population"
   },
   "Milk/Dairy allergy": {
     "ingredients": ["milk", "cheese", "butter", "cream", "casein", "whey", "lactose"],
     "severity": "high",
+    "nature": "allergy",
     "explanation": "Contains milk protein. This is an immune reaction to the protein, which is different from lactose intolerance.",
     "prevalence": "2-3% of children, 0.3% of adults"
   },
   "Egg allergy": {
     "ingredients": ["egg"],
     "severity": "high",
+    "nature": "allergy",
     "explanation": "Contains egg. Egg is an FDA major allergen.",
     "prevalence": "1-2% of children, most outgrow it"
   },
   "Fish allergy": {
     "ingredients": ["fish"],
     "severity": "high",
+    "nature": "allergy",
     "explanation": "Contains fish. Fish is an FDA major allergen and is often lifelong.",
     "prevalence": "~0.4% of adults"
   },
   "Shellfish allergy": {
     "ingredients": ["shellfish", "shrimp", "crab", "lobster"],
     "severity": "high",
+    "nature": "allergy",
     "explanation": "Contains crustacean shellfish. This is an FDA major allergen and reactions can be severe.",
     "prevalence": "0.5-2.5% of population"
   },
   "Soy allergy": {
     "ingredients": ["soy"],
     "severity": "high",
+    "nature": "allergy",
     "explanation": "Contains soy. Soy is an FDA major allergen.",
     "prevalence": "~0.4% of population"
   },
   "Sesame allergy": {
     "ingredients": ["sesame"],
     "severity": "high",
+    "nature": "allergy",
     "explanation": "Contains sesame. Sesame became the 9th FDA major allergen in 2023 and must now be declared on US labels.",
     "prevalence": "~0.2% of population"
   },
   "Wheat allergy": {
     "ingredients": ["wheat"],
     "severity": "high",
+    "nature": "allergy",
     "explanation": "Contains wheat. Wheat is an FDA major allergen. This is an allergy to wheat protein, which is distinct from celiac disease.",
     "prevalence": "0.2-1% of population"
   },
@@ -71,6 +80,7 @@
   "Celiac disease": {
     "ingredients": ["gluten", "wheat", "barley", "rye"],
     "severity": "high",
+    "nature": "autoimmune",
     "explanation": "Contains gluten. Celiac disease is an autoimmune condition, not an allergy or an intolerance, and it requires strict avoidance of wheat, barley and rye.",
     "prevalence": "~1% of population",
     "note": "The FDA 'gluten-free' label means under 20 parts per million."
@@ -78,6 +88,7 @@
   "Lactose intolerance": {
     "ingredients": ["lactose", "milk"],
     "severity": "medium",
+    "nature": "intolerance",
     "explanation": "Contains lactose. Lactose intolerance is dose-dependent, so the amount matters and many people tolerate some lactose without difficulty.",
     "prevalence": "~65% of the global population has reduced lactase persistence",
     "note": "Not an allergy. Aged cheese and yogurt are lower in lactose and are often tolerated."
@@ -85,6 +96,7 @@
   "Sulfite sensitivity": {
     "ingredients": ["sulfites", "sodium sulfite", "potassium sulfite"],
     "severity": "medium",
+    "nature": "intolerance",
     "explanation": "Contains sulfites. The FDA requires sulfites to be declared at 10 parts per million or above because they can provoke asthma symptoms in some people with asthma.",
     "prevalence": "5-10% of people with asthma"
   },
@@ -92,6 +104,7 @@
   "Acid reflux / GERD": {
     "ingredients": [],
     "severity": "medium",
+    "nature": "individual",
     "user_defined": true,
     "explanation": "Reflux triggers differ a lot from person to person.",
     "prevalence": "20-30% of adults in Western countries",

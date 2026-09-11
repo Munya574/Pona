@@ -16,6 +16,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 from app.database import get_db
+from app.ml.chef_card import build_chef_card
 from app.models import (
     User,
     SensitivityProfile,
@@ -182,4 +183,33 @@ async def update_profile(profile_id: int, body: ProfileCreate, db: Session = Dep
         profile_name=profile.profile_name,
         sensitivities=body.sensitivities,
         personal_triggers=body.personal_triggers,
+    )
+
+
+@router.get("/{profile_id}/chef-card")
+async def chef_card(profile_id: int, db: Session = Depends(get_db)):
+    """
+    The profile, written for a kitchen.
+
+    Regenerated on request rather than stored, so it can never go stale
+    against the profile it describes - including triggers the user adds
+    later as they work out what affects them.
+    """
+    profile = db.query(SensitivityProfile).get(profile_id)
+    if not profile:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+    sensitivities = db.execute(
+        select(user_sensitivities_table.c.sensitivity_name).where(
+            user_sensitivities_table.c.profile_id == profile_id
+        )
+    ).scalars().all()
+
+    return build_chef_card(
+        conditions=list(sensitivities),
+        personal_triggers=[
+            {"ingredient": t.ingredient, "condition": t.condition}
+            for t in profile.personal_triggers
+        ],
+        name=profile.profile_name,
     )

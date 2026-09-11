@@ -66,6 +66,13 @@ export const createProfile = (body) =>
 
 export const getProfile = (id) => request(`/profile/${id}`)
 
+/** The profile rendered for a kitchen. Regenerated per request so it cannot go stale. */
+export const getChefCard = (id) => request(`/profile/${id}/chef-card`)
+
+/** Look up a scanned barcode. Returns the product for the user to confirm. */
+export const lookupBarcode = (code) =>
+  request('/scan/barcode', { method: 'POST', body: JSON.stringify({ code }) })
+
 export const updateProfile = (id, body) =>
   request(`/profile/${id}`, { method: 'PUT', body: JSON.stringify(body) })
 

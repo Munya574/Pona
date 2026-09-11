@@ -17,7 +17,8 @@ print("PONA DATA EXPLORATION & SENSITIVITY KB BUILDING")
 print("=" * 80)
 
 FDC_DIR = Path("../data/raw/FoodData_Central_foundation_food_csv_2026-04-30")
-OFF_PATH = Path("../data/raw/en.openfoodfacts.org.products.csv")
+from off_data import find_off_csv
+OFF_PATH = find_off_csv()
 OUTPUT_DIR = Path("../data/processed")
 OUTPUT_DIR.mkdir(exist_ok=True)
 
