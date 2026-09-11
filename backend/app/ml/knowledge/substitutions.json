@@ -1,0 +1,99 @@
+{
+  "_README": {
+    "purpose": "What to use INSTEAD of an ingredient someone reacts to.",
+    "why_not_embeddings": "The original plan was FAISS over FoodBERT/Food2Vec embeddings. That is the wrong objective: embeddings encode which ingredients are SIMILAR, and cream is extremely similar to milk because they co-occur constantly in recipes. A substitution engine that suggests cream for milk is worse than useless to someone with a dairy allergy. Substitution needs functional equivalence PLUS allergen difference, which similarity alone cannot express. So this is curated.",
+    "safety_rule": "Every suggestion is re-checked against the user's own profile before display. A substitute that is dairy-free but contains tree nuts must never be offered to someone with a nut allergy. `contains` exists for exactly that check.",
+    "context": "baking = structure and chemistry matter (fat, protein, leavening). cooking = flavour and body matter. raw = eaten as-is.",
+    "STATUS": "SEED DATA - kitchen-tested common knowledge, not clinically reviewed. Ratios are starting points, not guarantees."
+  },
+
+  "milk": [
+    {"name": "Oat milk", "contains": ["oats"], "context": ["baking", "cooking", "raw"],
+     "notes": "Closest to dairy milk in body and sweetness. Swap 1:1. The usual first choice for tea and baking."},
+    {"name": "Soy milk", "contains": ["soy"], "context": ["baking", "cooking", "raw"],
+     "notes": "Highest protein of the alternatives, so it browns and sets most like dairy. Swap 1:1."},
+    {"name": "Lactose-free milk", "contains": ["casein"], "context": ["baking", "cooking", "raw"],
+     "notes": "Real dairy with the lactose already broken down. Behaves identically in cooking. Fine for lactose intolerance, NOT for a milk allergy - the protein is still there.",
+     "_contains_note": "Listed as casein, not milk, on purpose. The lactose is gone, so this must NOT flag for lactose intolerance; the milk protein remains, so it MUST flag for a dairy allergy. Listing 'milk' would have got both wrong."},
+    {"name": "Coconut milk", "contains": ["coconut"], "context": ["cooking"],
+     "notes": "Rich and works well in curries and sauces. Carries a distinct flavour, so not neutral."}
+  ],
+  "butter": [
+    {"name": "Olive oil", "contains": [], "context": ["cooking"],
+     "notes": "Use about 3/4 the volume of butter. Good for frying and sauces, wrong for pastry."},
+    {"name": "Dairy-free block margarine", "contains": ["soy"], "context": ["baking", "cooking"],
+     "notes": "Swap 1:1. Use a block rather than a soft spread for baking - spreads hold too much water."},
+    {"name": "Coconut oil", "contains": ["coconut"], "context": ["baking"],
+     "notes": "Solid at room temperature, so it creams like butter. Swap 1:1. Refined has less coconut flavour."}
+  ],
+  "cream": [
+    {"name": "Coconut cream", "contains": ["coconut"], "context": ["cooking", "baking"],
+     "notes": "Whips and enriches like double cream. Chill the tin first. Adds coconut flavour."},
+    {"name": "Oat cream", "contains": ["oats"], "context": ["cooking"],
+     "notes": "Neutral, pours and reduces like single cream. Will not whip."}
+  ],
+  "cheese": [
+    {"name": "Nutritional yeast", "contains": [], "context": ["cooking"],
+     "notes": "Savoury and cheese-like for sauces and pasta. Not a melting cheese."},
+    {"name": "Plant-based hard cheese", "contains": ["cashews", "coconut"], "context": ["cooking", "raw"],
+     "notes": "Check the base - most are cashew or coconut, which matters if nuts are also a problem."}
+  ],
+  "wheat": [
+    {"name": "Gluten-free flour blend", "contains": [], "context": ["baking"],
+     "notes": "Swap 1:1 for blends containing xanthan gum. Without it, baked goods crumble."},
+    {"name": "Rice flour", "contains": [], "context": ["cooking"],
+     "notes": "Good for thickening and coating. Too gritty alone for bread."},
+    {"name": "Cornflour", "contains": [], "context": ["cooking"],
+     "notes": "Thickens sauces. Use half the quantity of wheat flour."}
+  ],
+  "egg": [
+    {"name": "Flax egg", "contains": [], "context": ["baking"],
+     "notes": "1 tbsp ground flaxseed + 3 tbsp water, rested 5 minutes, per egg. Binds well; will not aerate."},
+    {"name": "Aquafaba", "contains": [], "context": ["baking"],
+     "notes": "3 tbsp chickpea tin liquid per egg. The one substitute that actually whips to peaks."},
+    {"name": "Mashed banana", "contains": [], "context": ["baking"],
+     "notes": "Half a banana per egg in cakes and muffins. Adds sweetness and flavour."}
+  ],
+  "peanuts": [
+    {"name": "Sunflower seed butter", "contains": [], "context": ["cooking", "raw", "baking"],
+     "notes": "Closest texture and fat content to peanut butter, and seed-based rather than nut."},
+    {"name": "Pumpkin seeds", "contains": [], "context": ["cooking", "raw"],
+     "notes": "For crunch in salads and stir-fries."}
+  ],
+  "tree nuts": [
+    {"name": "Toasted seeds", "contains": [], "context": ["cooking", "raw", "baking"],
+     "notes": "Pumpkin or sunflower seeds give the crunch without nuts."},
+    {"name": "Toasted oats", "contains": ["oats"], "context": ["baking"],
+     "notes": "For texture in crumbles and granola."}
+  ],
+  "soy": [
+    {"name": "Coconut aminos", "contains": ["coconut"], "context": ["cooking"],
+     "notes": "Replaces soy sauce. Sweeter and less salty, so season afterwards."},
+    {"name": "Chickpea miso", "contains": [], "context": ["cooking"],
+     "notes": "Fermented depth without soy."}
+  ],
+
+  "_reflux_note": "The entries below are for people who have identified these as their own triggers. Pona does not assume anyone with reflux reacts to them.",
+  "tomato": [
+    {"name": "Roasted red pepper", "contains": [], "context": ["cooking"],
+     "notes": "Blended, it gives a sweet red sauce base with far less acid."},
+    {"name": "Pumpkin or carrot base", "contains": [], "context": ["cooking"],
+     "notes": "Makes a mild, naturally sweet sauce. Works well for pasta and stews."}
+  ],
+  "coffee": [
+    {"name": "Rooibos", "contains": [], "context": ["raw"],
+     "notes": "Naturally caffeine-free, low acid, and has some of the roasted depth."},
+    {"name": "Chicory root drink", "contains": [], "context": ["raw"],
+     "notes": "Roasted and bitter like coffee, with no caffeine."}
+  ],
+  "chocolate": [
+    {"name": "Carob", "contains": [], "context": ["baking", "raw"],
+     "notes": "Naturally sweet, caffeine-free and lower acid. Swap 1:1 for cocoa powder."}
+  ],
+  "onion": [
+    {"name": "Green tops of spring onion", "contains": [], "context": ["cooking"],
+     "notes": "The green part is much better tolerated than the bulb by many people."},
+    {"name": "Fennel", "contains": [], "context": ["cooking"],
+     "notes": "Gives sweetness and aromatic base when softened slowly."}
+  ]
+}

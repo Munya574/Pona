@@ -72,9 +72,14 @@ export default function Scan() {
     <div className="p-6 flex flex-col min-h-screen">
       <div className="flex items-center justify-between mt-10">
         <h1 className="text-2xl font-bold">Check a food</h1>
-        <Link to="/profile" className="text-sm text-gray-500 underline">
-          Profile
-        </Link>
+        <div className="flex gap-4">
+          <Link to="/card" className="text-sm text-gray-500 underline">
+            Chef card
+          </Link>
+          <Link to="/profile" className="text-sm text-gray-500 underline">
+            Profile
+          </Link>
+        </div>
       </div>
 
       <p className="text-gray-600 mt-2 text-sm leading-relaxed">
