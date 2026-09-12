@@ -36,6 +36,7 @@ export default function Result() {
   if (!result) return null
 
   const ocrWarning = state?.ocrWarning
+  const product = state?.product
   const view = STATES[result.verdict] || STATES.possible_triggers
   const confirmed = result.triggers.filter((t) => t.confidence === 'confirmed')
   const possible = result.triggers.filter((t) => t.confidence === 'possible')
@@ -55,6 +56,22 @@ export default function Result() {
             {view.sub}
           </p>
         </div>
+
+        {product && (
+          <div className="mt-5 pb-4 border-b border-gray-200">
+            <p className="text-xs font-bold tracking-widest text-gray-500 uppercase">
+              Checked against
+            </p>
+            <p className="text-lg font-semibold leading-tight mt-1">
+              {product.name}
+            </p>
+            <p className="text-xs text-gray-500 mt-1.5 leading-relaxed">
+              Ingredients from {product.source}
+              {product.last_modified ? `, last updated ${product.last_modified}` : ''}
+              . Recipes change without the barcode changing.
+            </p>
+          </div>
+        )}
 
         {/* An unreliable photo read outranks everything else on this screen.
             If words were dropped, "no triggers found" is meaningless — the
