@@ -4,6 +4,7 @@ import Scan from './pages/Scan'
 import Result from './pages/Result'
 import Profile from './pages/Profile'
 import ChefCard from './pages/ChefCard'
+import BarcodeScan from './pages/BarcodeScan'
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/result" element={<Result />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/card" element={<ChefCard />} />
+        <Route path="/barcode" element={<BarcodeScan />} />
       </Routes>
     </div>
   )
